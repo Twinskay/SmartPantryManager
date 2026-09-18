@@ -35,6 +35,19 @@ public class AddIngredientActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT).show();
             return;
         }
+            double quantityValue = Double.parseDouble(quantity);
+            DatabaseHelper databaseHelper = new DatabaseHelper(AddIngredientActivity.this);
+            boolean inserted = databaseHelper.addIngredient(name, quantityValue, unit, expiryDate);
+            if (inserted) {
+                Toast.makeText(AddIngredientActivity.this,
+                        "Ingredient saved",
+                        Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                Toast.makeText(AddIngredientActivity.this,
+                        "Could not save ingredient",
+                        Toast.LENGTH_SHORT).show();
+            }
         });
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
