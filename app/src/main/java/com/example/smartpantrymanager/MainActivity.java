@@ -9,6 +9,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,7 +20,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+
         setContentView(R.layout.activity_main);
+
+        RecyclerView recyclerPantry = findViewById(R.id.recyclerPantry);
+        recyclerPantry.setLayoutManager(new LinearLayoutManager(this));
+
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        ArrayList<PantryItem> ingredientList = databaseHelper.getAllIngredients();
+
+        PantryAdapter pantryAdapter = new PantryAdapter(ingredientList);
+        recyclerPantry.setAdapter(pantryAdapter);
+
+
         Button btnAddIngredient = findViewById(R.id.btnAddIngredient);
         btnAddIngredient.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, AddIngredientActivity.class);
