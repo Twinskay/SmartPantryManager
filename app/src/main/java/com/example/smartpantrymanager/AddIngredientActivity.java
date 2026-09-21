@@ -23,6 +23,18 @@ public class AddIngredientActivity extends AppCompatActivity {
         EditText txtQuantity = findViewById(R.id.txtQuantity);
         EditText txtUnit = findViewById(R.id.txtUnit);
         EditText txtExpiryDate = findViewById(R.id.txtExpiryDate);
+        int ingredientId = getIntent().getIntExtra("ingredient_id",
+                -1);
+        if (ingredientId != -1) {
+            txtIngredientName.setText(getIntent().getStringExtra("ingredient_name"));
+            txtQuantity.setText(String.valueOf(
+                    getIntent().getDoubleExtra("ingredient_quantity", 0)
+            ));
+            txtUnit.setText(getIntent().getStringExtra("ingredient_unit"));
+            txtExpiryDate.setText(getIntent().getStringExtra("ingredient_expiry"));
+
+
+        }
         btnSaveIngredient.setOnClickListener(v -> {
 
         String name = txtIngredientName.getText().toString().trim();
@@ -37,8 +49,19 @@ public class AddIngredientActivity extends AppCompatActivity {
         }
             double quantityValue = Double.parseDouble(quantity);
             DatabaseHelper databaseHelper = new DatabaseHelper(AddIngredientActivity.this);
-            boolean inserted = databaseHelper.addIngredient(name, quantityValue, unit, expiryDate);
-            if (inserted) {
+            boolean success;
+            if (ingredientId != -1) {
+                success = databaseHelper.updateIngredient(
+                        ingredientId, name, quantityValue, unit, expiryDate
+                );
+            }
+            else {
+                success = databaseHelper.addIngredient(
+                        name, quantityValue, unit, expiryDate
+                );
+            }
+            if (success) {
+
                 Toast.makeText(AddIngredientActivity.this,
                         "Ingredient saved",
                         Toast.LENGTH_SHORT).show();
@@ -54,5 +77,5 @@ public class AddIngredientActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+        }
     }
-}

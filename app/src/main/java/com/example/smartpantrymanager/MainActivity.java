@@ -15,7 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
+    RecyclerView recyclerPantry;
+    DatabaseHelper databaseHelper;
+    PantryAdapter pantryAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,13 +25,13 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        RecyclerView recyclerPantry = findViewById(R.id.recyclerPantry);
+        recyclerPantry = findViewById(R.id.recyclerPantry);
         recyclerPantry.setLayoutManager(new LinearLayoutManager(this));
 
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        databaseHelper = new DatabaseHelper(this);
         ArrayList<PantryItem> ingredientList = databaseHelper.getAllIngredients();
 
-        PantryAdapter pantryAdapter = new PantryAdapter(ingredientList);
+        pantryAdapter = new PantryAdapter(ingredientList);
         recyclerPantry.setAdapter(pantryAdapter);
 
 
@@ -44,4 +46,12 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
     }
-}
+        @Override
+        protected void onResume() {
+            super.onResume();
+
+            ArrayList<PantryItem> ingredientList = databaseHelper.getAllIngredients();
+            pantryAdapter = new PantryAdapter(ingredientList);
+            recyclerPantry.setAdapter(pantryAdapter);
+        }
+    }

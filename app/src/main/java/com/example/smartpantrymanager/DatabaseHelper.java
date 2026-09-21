@@ -73,7 +73,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return ingredientList;
     }
-}
+    public boolean deleteIngredient(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        int result = db.delete(
+                TABLE_PANTRY,
+                COL_ID + " = ?",
+                new String[]{String.valueOf(id)}
+        );
+
+        return result > 0;
+    }
+    public boolean updateIngredient(int id, String name, double quantity,
+                                    String unit, String expiryDate) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(COL_NAME, name);
+        values.put(COL_QUANTITY, quantity);
+        values.put(COL_UNIT, unit);
+        values.put(COL_EXPIRY_DATE, expiryDate);
+
+        int result = db.update(
+                TABLE_PANTRY,
+                values,
+                COL_ID + " = ?",
+                new String[]{String.valueOf(id)}
+        );
+
+        return result > 0;
+    }
+
+    }
+
 
 
         
