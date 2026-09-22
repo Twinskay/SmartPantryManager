@@ -270,6 +270,167 @@ private void addRecipeIngredient(SQLiteDatabase db, long recipeId,
         addRecipeIngredient(db, recipe15, "Tomato", 1, "pieces");
     }
 
+    public ArrayList<Recipe> getMatchingRecipes() {
+        ArrayList<Recipe> matchingRecipes = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor recipeCursor = db.rawQuery(
+                "SELECT * FROM " + TABLE_RECIPES,
+                null
+        );
+        if (recipeCursor.moveToFirst()) {
+            do {
+                int recipeId = recipeCursor.getInt(
+                        recipeCursor.getColumnIndexOrThrow(COL_RECIPE_ID)
+                );
+
+                String recipeName = recipeCursor.getString(
+                        recipeCursor.getColumnIndexOrThrow(COL_RECIPE_NAME)
+                );
+
+                String recipeSteps = recipeCursor.getString(
+                        recipeCursor.getColumnIndexOrThrow(COL_RECIPE_STEPS)
+                );
+                boolean allIngredientsAvailable = true;
+
+                Cursor ingredientCursor = db.rawQuery(
+                        "SELECT * FROM " + TABLE_RECIPE_INGREDIENTS +
+                                " WHERE " + COL_RI_RECIPE_ID + " = ?",
+                        new String[]{String.valueOf(recipeId)}
+                );
+                if (ingredientCursor.moveToFirst()) {
+                    do {
+                        String requiredName = ingredientCursor.getString(
+                                ingredientCursor.getColumnIndexOrThrow(COL_RI_INGREDIENT_NAME)
+                        );
+                        String normalizedRequiredName = normalizeIngredientName(requiredName);
+                        double requiredQuantity = ingredientCursor.getDouble(
+                                ingredientCursor.getColumnIndexOrThrow(COL_RI_QUANTITY)
+                        );
+
+                        String requiredUnit = ingredientCursor.getString(
+
+                                ingredientCursor.getColumnIndexOrThrow(COL_RI_UNIT)
+                        );
+                        Cursor pantryCursor = db.rawQuery(
+                                "SELECT * FROM " + TABLE_PANTRY,
+                                null
+                        );
+
+                        boolean ingredientFound = false;
+
+                        if (pantryCursor.moveToFirst()) {
+                            do {
+                                String pantryName = pantryCursor.getString(
+                                        pantryCursor.getColumnIndexOrThrow(COL_NAME)
+                                );
+
+                                String normalizedPantryName = normalizeIngredientName(pantryName);
+
+                                if (normalizedPantryName.equals(normalizedRequiredName)) {
+
+                                    double pantryQuantity = pantryCursor.getDouble(
+                                            pantryCursor.getColumnIndexOrThrow(COL_QUANTITY)
+                                    );
+
+                                    String pantryUnit = pantryCursor.getString(
+                                            pantryCursor.getColumnIndexOrThrow(COL_UNIT)
+                                    );
+                                    if (!getUnitType(pantryUnit).equals(getUnitType(requiredUnit))) {
+                                        continue;
+                                    }
+                                    double convertedPantryQuantity =
+                                            convertToBaseUnit(pantryQuantity, pantryUnit);
+
+                                    double convertedRequiredQuantity =
+                                            convertToBaseUnit(requiredQuantity, requiredUnit);
+
+                                    if (convertedPantryQuantity >= convertedRequiredQuantity) {
+                                        ingredientFound = true;
+                                        break;
+                                    }
+                                }
+
+
+                            } while (pantryCursor.moveToNext());
+                            }
+
+
+                        if (!ingredientFound) {
+                            allIngredientsAvailable = false;
+                        }
+
+
+                        pantryCursor.close();
+                    } while (ingredientCursor.moveToNext());
+                    ingredientCursor.close();
+                    if (allIngredientsAvailable) {
+                        matchingRecipes.add(
+                                new Recipe(recipeId, recipeName, recipeSteps)
+                        );
+                    }
+
+                }
+
+
+
+            } while (recipeCursor.moveToNext());
+
+        }
+        recipeCursor.close();
+
+
+        return matchingRecipes;
+    }
+
+        private String normalizeIngredientName(String name) {
+            String normalized = name.trim().toLowerCase();
+
+            if (normalized.endsWith("oes")) {
+                normalized = normalized.substring(0, normalized.length() - 2);
+            } else if (normalized.endsWith("s") && !normalized.endsWith("ss")) {
+                normalized = normalized.substring(0, normalized.length() - 1);
+            }
+
+            return normalized;
+        }
+    private String getUnitType(String unit) {
+        String normalizedUnit = unit.trim().toLowerCase();
+
+        if (normalizedUnit.equals("g") || normalizedUnit.equals("kg")) {
+            return "weight";
+        }
+
+        if (normalizedUnit.equals("ml") || normalizedUnit.equals("l")) {
+            return "volume";
+        }
+
+        if (normalizedUnit.equals("piece") || normalizedUnit.equals("pieces")) {
+            return "piece";
+        }
+
+        if (normalizedUnit.equals("slice") || normalizedUnit.equals("slices")) {
+            return "slice";
+        }
+
+        return normalizedUnit;
+    }
+    private double convertToBaseUnit(double quantity, String unit) {
+        String normalizedUnit = unit.trim().toLowerCase();
+
+        switch (normalizedUnit) {
+            case "kg":
+                return quantity * 1000;
+            case "g":
+                return quantity;
+            case "l":
+                return quantity * 1000;
+            case "ml":
+                return quantity;
+            default:
+                return quantity;
+        }
+    }
 }
 
 

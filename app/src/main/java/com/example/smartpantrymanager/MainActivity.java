@@ -31,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
         ArrayList<PantryItem> ingredientList = databaseHelper.getAllIngredients();
 
+
         pantryAdapter = new PantryAdapter(ingredientList);
         recyclerPantry.setAdapter(pantryAdapter);
 
