@@ -18,12 +18,18 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerPantry;
     DatabaseHelper databaseHelper;
     PantryAdapter pantryAdapter;
+    Button btnSuggestedRecipes;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
 
         setContentView(R.layout.activity_main);
+        btnSuggestedRecipes = findViewById(R.id.btnSuggestedRecipes);
+        btnSuggestedRecipes.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SuggestedRecipesActivity.class);
+            startActivity(intent);
+        });
 
         recyclerPantry = findViewById(R.id.recyclerPantry);
         recyclerPantry.setLayoutManager(new LinearLayoutManager(this));

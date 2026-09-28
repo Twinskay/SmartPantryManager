@@ -44,7 +44,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_EXPIRY_DATE + " TEXT)";
 
 
-
         db.execSQL(createPantryTable);
 
         String createRecipeTable = "CREATE TABLE " + TABLE_RECIPES + " (" +
@@ -104,6 +103,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return ingredientList;
     }
+
     public boolean deleteIngredient(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
 
@@ -115,6 +115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return result > 0;
     }
+
     public boolean updateIngredient(int id, String name, double quantity,
                                     String unit, String expiryDate) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -134,6 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return result > 0;
     }
+
     private long addRecipe(SQLiteDatabase db, String name, String steps) {
         ContentValues values = new ContentValues();
 
@@ -143,19 +145,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.insert(TABLE_RECIPES, null, values);
     }
 
-private void addRecipeIngredient(SQLiteDatabase db, long recipeId,
-                                 String ingredientName, double quantity, String unit) {
+    private void addRecipeIngredient(SQLiteDatabase db, long recipeId,
+                                     String ingredientName, double quantity, String unit) {
 
-    ContentValues values = new ContentValues();
+        ContentValues values = new ContentValues();
 
-    values.put(DatabaseHelper.COL_RI_RECIPE_ID, recipeId);
-    values.put(DatabaseHelper.COL_RI_INGREDIENT_NAME, ingredientName);
-    values.put(DatabaseHelper.COL_RI_QUANTITY, quantity);
-    values.put(DatabaseHelper.COL_RI_UNIT, unit);
+        values.put(DatabaseHelper.COL_RI_RECIPE_ID, recipeId);
+        values.put(DatabaseHelper.COL_RI_INGREDIENT_NAME, ingredientName);
+        values.put(DatabaseHelper.COL_RI_QUANTITY, quantity);
+        values.put(DatabaseHelper.COL_RI_UNIT, unit);
 
-    db.insert(DatabaseHelper.TABLE_RECIPE_INGREDIENTS, null, values);
+        db.insert(DatabaseHelper.TABLE_RECIPE_INGREDIENTS, null, values);
 
-}
+    }
+
     private void seedRecipes(SQLiteDatabase db) {
         long recipe1 = addRecipe(db,
                 "Tomato Toast",
@@ -353,7 +356,7 @@ private void addRecipeIngredient(SQLiteDatabase db, long recipeId,
 
 
                             } while (pantryCursor.moveToNext());
-                            }
+                        }
 
 
                         if (!ingredientFound) {
@@ -373,7 +376,6 @@ private void addRecipeIngredient(SQLiteDatabase db, long recipeId,
                 }
 
 
-
             } while (recipeCursor.moveToNext());
 
         }
@@ -383,17 +385,18 @@ private void addRecipeIngredient(SQLiteDatabase db, long recipeId,
         return matchingRecipes;
     }
 
-        private String normalizeIngredientName(String name) {
-            String normalized = name.trim().toLowerCase();
+    private String normalizeIngredientName(String name) {
+        String normalized = name.trim().toLowerCase();
 
-            if (normalized.endsWith("oes")) {
-                normalized = normalized.substring(0, normalized.length() - 2);
-            } else if (normalized.endsWith("s") && !normalized.endsWith("ss")) {
-                normalized = normalized.substring(0, normalized.length() - 1);
-            }
-
-            return normalized;
+        if (normalized.endsWith("oes")) {
+            normalized = normalized.substring(0, normalized.length() - 2);
+        } else if (normalized.endsWith("s") && !normalized.endsWith("ss")) {
+            normalized = normalized.substring(0, normalized.length() - 1);
         }
+
+        return normalized;
+    }
+
     private String getUnitType(String unit) {
         String normalizedUnit = unit.trim().toLowerCase();
 
@@ -415,6 +418,7 @@ private void addRecipeIngredient(SQLiteDatabase db, long recipeId,
 
         return normalizedUnit;
     }
+
     private double convertToBaseUnit(double quantity, String unit) {
         String normalizedUnit = unit.trim().toLowerCase();
 
@@ -430,9 +434,36 @@ private void addRecipeIngredient(SQLiteDatabase db, long recipeId,
             default:
                 return quantity;
         }
+
+    }
+
+    public String getRecipeIngredients(int recipeId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery(
+                "SELECT ingredient_name, required_quantity, required_unit FROM recipe_ingredients WHERE recipe_id = ?",
+                new String[]{String.valueOf(recipeId)}
+        );
+
+        StringBuilder ingredients = new StringBuilder();
+
+        while (cursor.moveToNext()) {
+            String name = cursor.getString(cursor.getColumnIndexOrThrow("ingredient_name"));
+            double quantity = cursor.getDouble(cursor.getColumnIndexOrThrow("required_quantity"));
+            String unit = cursor.getString(cursor.getColumnIndexOrThrow("required_unit"));
+
+            ingredients.append(name)
+                    .append(" - ")
+                    .append(quantity)
+                    .append(" ")
+                    .append(unit)
+                    .append("\n");
+        }
+
+        cursor.close();
+        return ingredients.toString().trim();
     }
 }
-
 
         
 
