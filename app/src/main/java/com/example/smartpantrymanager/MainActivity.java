@@ -11,7 +11,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
@@ -19,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
     DatabaseHelper databaseHelper;
     PantryAdapter pantryAdapter;
     Button btnSuggestedRecipes;
+    Button btnSettings;
+    BottomNavigationView bottomNavigation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,11 +28,38 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         btnSuggestedRecipes = findViewById(R.id.btnSuggestedRecipes);
+        btnSettings = findViewById(R.id.btnSettings);
+        bottomNavigation = findViewById(R.id.bottomNavigation);
         btnSuggestedRecipes.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, SuggestedRecipesActivity.class);
             startActivity(intent);
         });
+        btnSettings.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        });
+        bottomNavigation.setOnItemSelectedListener(item -> {
 
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.navPantry) {
+                return true;
+            }
+
+            if (itemId == R.id.navRecipes) {
+                Intent intent = new Intent(MainActivity.this, SuggestedRecipesActivity.class);
+                startActivity(intent);
+                return true;
+            }
+
+            if (itemId == R.id.navSettings) {
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            }
+
+            return false;
+        });
         recyclerPantry = findViewById(R.id.recyclerPantry);
         recyclerPantry.setLayoutManager(new LinearLayoutManager(this));
 
