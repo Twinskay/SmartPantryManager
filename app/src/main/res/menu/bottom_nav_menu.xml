@@ -3,14 +3,14 @@
 
     <item
         android:id="@+id/navPantry"
-        android:title="Pantry" />
+        android:title="@string/nav_pantry" />
 
     <item
         android:id="@+id/navRecipes"
-        android:title="Recipes" />
+        android:title="@string/nav_recipes" />
 
     <item
         android:id="@+id/navSettings"
-        android:title="Settings" />
+        android:title="@string/nav_settings" />
 
 </menu>

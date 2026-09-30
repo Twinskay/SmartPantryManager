@@ -5,13 +5,17 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
     tools:context=".SuggestedRecipesActivity">
 
     <TextView
+
         android:id="@+id/lblSuggestedRecipes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Suggested Recipes"
+        android:layout_marginTop="40dp"
+        android:text="@string/suggested_recipes"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,8 +24,11 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerSuggestedRecipes"
-        android:layout_width="409dp"
-        android:layout_height="638dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,8 +38,13 @@
         android:id="@+id/txtNoRecipes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="392dp"
-        android:text="No recipes match your pantry ingredients."
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:gravity="center"
+        android:text="@string/no_recipes_match"
+        android:textSize="18sp"
+        android:textStyle="bold"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
